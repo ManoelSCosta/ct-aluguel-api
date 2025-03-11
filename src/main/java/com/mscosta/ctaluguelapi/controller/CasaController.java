@@ -31,5 +31,23 @@ public class CasaController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping()
+    public ResponseEntity<CasaResponseDto> inserirCasa(CasaRequestDto request) {
+        final var response = casaService.criarCasa(request);
+        return new ResponseEntity<>(response, response != null ? org.springframework.http.HttpStatus.OK : org.springframework.http.HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CasaResponseDto> atualizarCasa(@PathVariable("id") long id, @RequestBody CasaRequestDto request) {
+        final var response = casaService.atualizarCasa(id, request);
+        return new ResponseEntity<>(response, response != null ? org.springframework.http.HttpStatus.OK : org.springframework.http.HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarCasa(@PathVariable("id") long id) {
+        casaService.deletarCasa(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
 }

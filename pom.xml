@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.mscosta</groupId>
 	<artifactId>ct-aluguel-api</artifactId>
-	<version>0.3.2</version>
+	<version>0.6.0</version>
 	<name>ct-aluguel-api</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
