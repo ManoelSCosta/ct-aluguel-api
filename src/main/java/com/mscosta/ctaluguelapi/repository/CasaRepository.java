@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface CasaRepository extends JpaRepository<Casa, Long> {
-    Page<CasaResponseDto> findByDescricaoLikeIgnoreCaseAndEnderecoLikeIgnoreCase(@Nullable String descricao, @Nullable String endereco, Pageable pageable);
+    Page<Casa> findByDescricaoLikeIgnoreCaseAndEnderecoLikeIgnoreCase(@Nullable String descricao, @Nullable String endereco, Pageable pageable);
 
 
     Optional<Casa> findByIdOrDescricaoLikeIgnoreCaseOrEnderecoLikeIgnoreCase(long id, @Nullable String descricao, @Nullable String endereco);

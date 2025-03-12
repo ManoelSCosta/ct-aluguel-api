@@ -5,6 +5,12 @@ public class CasaResponseDto {
     private String endereco;
     private Boolean disponivel;
 
+    public CasaResponseDto(String descricao, String endereco, Boolean disponivel) {
+        this.descricao = descricao;
+        this.endereco = endereco;
+        this.disponivel = disponivel;
+    }
+
     public String getDescricao() {
         return descricao;
     }

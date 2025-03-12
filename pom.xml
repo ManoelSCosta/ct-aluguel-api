@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.mscosta</groupId>
 	<artifactId>ct-aluguel-api</artifactId>
-	<version>0.6.0</version>
+	<version>0.7.0</version>
 	<name>ct-aluguel-api</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -45,15 +45,17 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-bom</artifactId>
-			<version>2023.1.4</version>
-			<scope>compile</scope>
-			<type>pom</type>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version> <!-- Versão compatível com Spring Boot 3.2.x -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 
 	</dependencies>

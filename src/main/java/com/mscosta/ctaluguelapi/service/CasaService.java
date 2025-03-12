@@ -21,16 +21,13 @@ public class CasaService {
 
        final var isDisponivel = !contratoService.existContratoByCasaId(casa.getId());
 
-        CasaResponseDto response = new CasaResponseDto();
-        response.setDescricao(casa.getDescricao());
-        response.setEndereco(casa.getEndereco());
-        response.setDisponivel(isDisponivel);
-
-        return response;
+        return new CasaResponseDto(casa.getDescricao(), casa.getEndereco(), isDisponivel);
     }
 
     public Page<CasaResponseDto> getAllCasas(CasaRequestDto request, PageRequest pageable) {
-        return casaRepository.findByDescricaoLikeIgnoreCaseAndEnderecoLikeIgnoreCase(request.getDescricao(), request.getEndereco(), pageable);
+        Page<Casa> casas = casaRepository.findByDescricaoLikeIgnoreCaseAndEnderecoLikeIgnoreCase(request.getDescricao(), request.getEndereco(), pageable);
+
+        return casas.map(casa -> new CasaResponseDto(casa.getDescricao(), casa.getEndereco(), !contratoService.existContratoByCasaId(casa.getId())));
     }
 
     public CasaResponseDto criarCasa(CasaRequestDto request) {

@@ -3,6 +3,8 @@ package com.mscosta.ctaluguelapi.controller;
 import com.mscosta.ctaluguelapi.dto.request.CasaRequestDto;
 import com.mscosta.ctaluguelapi.dto.response.CasaResponseDto;
 import com.mscosta.ctaluguelapi.service.CasaService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,9 +28,13 @@ public class CasaController {
 
     @GetMapping()
     public ResponseEntity<Page<CasaResponseDto>> getAllCasas(CasaRequestDto request) {
-        PageRequest pageable = PageRequest.of(request.getPage(), request.getSize());
-        final var response = casaService.getAllCasas(request, pageable);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            PageRequest pageable = PageRequest.of(request.getPage(), request.getSize());
+            final var response = casaService.getAllCasas(request, pageable);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping()
