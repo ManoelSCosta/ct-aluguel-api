@@ -2,6 +2,7 @@ package com.mscosta.ctaluguelapi.service;
 
 import com.mscosta.ctaluguelapi.dto.request.PessoaRequestDto;
 import com.mscosta.ctaluguelapi.dto.response.PessoaResponseDto;
+import com.mscosta.ctaluguelapi.exception.NotFoundException;
 import com.mscosta.ctaluguelapi.model.Pessoa;
 import com.mscosta.ctaluguelapi.repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class PessoaService {
     }
     private Pessoa findPessoaById(long id) {
         return pessoaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada"));
+                .orElseThrow(() -> new NotFoundException("Pessoa não encontrada"));
     }
     private PessoaResponseDto buildResponse(Pessoa pessoaSave) {
         final var response = new PessoaResponseDto();

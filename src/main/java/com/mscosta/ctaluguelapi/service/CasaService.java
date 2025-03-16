@@ -2,6 +2,7 @@ package com.mscosta.ctaluguelapi.service;
 
 import com.mscosta.ctaluguelapi.dto.request.CasaRequestDto;
 import com.mscosta.ctaluguelapi.dto.response.CasaResponseDto;
+import com.mscosta.ctaluguelapi.exception.NotFoundException;
 import com.mscosta.ctaluguelapi.model.Casa;
 import com.mscosta.ctaluguelapi.repository.CasaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class CasaService {
     private ContratoService contratoService;
 
     public CasaResponseDto getCasaById(long id) {
-        final var casa = casaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Casa não encontrada"));
+        final var casa = casaRepository.findById(id).orElseThrow(() -> new NotFoundException("Casa não encontrada"));
 
        final var isDisponivel = !contratoService.existContratoByCasaId(casa.getId());
 
