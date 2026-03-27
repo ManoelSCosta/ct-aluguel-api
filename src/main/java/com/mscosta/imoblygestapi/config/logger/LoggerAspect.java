@@ -16,70 +16,75 @@ import java.util.Arrays;
 @Aspect
 @Component
 public class LoggerAspect {
-    private static final Logger logger = LoggerFactory.getLogger(LoggerAspect.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+
+    private static final Logger LOG = LoggerFactory.getLogger(LoggerAspect.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String APPLICATION_PACKAGES_POINTCUT =
+            "execution(* com.mscosta.imoblygestapi.controller..*(..)) || " +
+                    "execution(* com.mscosta.imoblygestapi.service..*(..))";
 
     static {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
+        MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
-    @Around("execution(* com.mscosta.ctaluguelapi.controller..*(..)) || execution(* com.mscosta.ctaluguelapi.service..*(..))")
+    @Around(APPLICATION_PACKAGES_POINTCUT)
     public Object logMethodCall(ProceedingJoinPoint joinPoint) throws Throwable {
-        String nomeMetodo = joinPoint.getSignature().getName();
-        String nomeClasse = joinPoint.getTarget().getClass().getSimpleName();
+        final String methodSignature = buildMethodSignature(joinPoint);
+        final String arguments = serializeArguments(joinPoint.getArgs());
 
-        String argsSerializado = Arrays.stream(joinPoint.getArgs())
-                        .map(this::serializarArgumento)
-                                .toList()
-                                        .toString();
+        LOG.info("=> {}({})", methodSignature, arguments);
 
-        logger.info("=> {}#{}({})", nomeClasse, nomeMetodo, argsSerializado);
+        final long startTime = System.currentTimeMillis();
+        final Object result = joinPoint.proceed();
+        final long elapsedTime = System.currentTimeMillis() - startTime;
 
-
-        long start = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
-        long end = System.currentTimeMillis();
-        String resultSerializado = serializarArgumento(result);
-        logger.info("<= {}#{} [{}ms] {}", nomeClasse, nomeMetodo, (end - start), resultSerializado);
+        LOG.info("<= {} [{}ms] {}", methodSignature, elapsedTime, serializeArgument(result));
         return result;
     }
 
-    private String serializarArgumento(Object arg) {
-        if(arg == null) {
+    @AfterThrowing(pointcut = APPLICATION_PACKAGES_POINTCUT, throwing = "ex")
+    public void logException(JoinPoint joinPoint, Throwable ex) {
+        final String methodSignature = buildMethodSignature(joinPoint);
+        final String arguments = serializeArguments(joinPoint.getArgs());
+
+        LOG.error("[ERRO] {} - Argumentos: {} - Erro: {}", methodSignature, arguments, ex.getMessage());
+    }
+
+    private String buildMethodSignature(JoinPoint joinPoint) {
+        final String className = joinPoint.getTarget().getClass().getSimpleName();
+        final String methodName = joinPoint.getSignature().getName();
+        return className + "#" + methodName;
+    }
+
+    private String serializeArguments(Object[] args) {
+        return Arrays.stream(args)
+                .map(this::serializeArgument)
+                .toList()
+                .toString();
+    }
+
+    private String serializeArgument(Object arg) {
+        if (arg == null) {
             return "null";
         }
 
-        if(arg.getClass().isPrimitive() || isWrapperOrString(arg)){
+        if (isPrimitiveOrWrapperOrString(arg)) {
             return arg.toString();
         }
 
         try {
-            return mapper.writeValueAsString(arg);
+            return MAPPER.writeValueAsString(arg);
         } catch (Exception e) {
             return String.format("Erro ao serializar argumento: %s", e.getMessage());
         }
     }
 
-    private boolean isWrapperOrString(Object arg) {
-        return arg instanceof Boolean ||
-                arg instanceof Number ||
-                arg instanceof String ||
-                arg instanceof Character;
-    }
-
-    @AfterThrowing(
-            pointcut = "execution(* com.mscosta.ctaluguelapi.controller..*(..)) || execution(* com.mscosta.ctaluguelapi.service..*(..))",
-            throwing = "ex"
-    )
-    public void logException(JoinPoint joinPoint, Throwable ex) {
-        String nomeMetodo = joinPoint.getSignature().getName();
-        String nomeClasse = joinPoint.getTarget().getClass().getSimpleName();
-        String argsSerializado = Arrays.stream(joinPoint.getArgs())
-                .map(this::serializarArgumento)
-                .toList()
-                .toString();
-
-        logger.error("[ERRO] {}.{}() - Argumentos: {} - Erro: {}", nomeClasse, nomeMetodo, argsSerializado, ex.getMessage());
+    private boolean isPrimitiveOrWrapperOrString(Object arg) {
+        return arg.getClass().isPrimitive()
+                || arg instanceof Boolean
+                || arg instanceof Number
+                || arg instanceof String
+                || arg instanceof Character;
     }
 }

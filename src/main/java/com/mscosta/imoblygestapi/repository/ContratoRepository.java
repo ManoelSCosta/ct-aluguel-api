@@ -1,28 +1,16 @@
 package com.mscosta.imoblygestapi.repository;
 
-import com.mscosta.imoblygestapi.model.Contrato;
+import com.mscosta.imoblygestapi.entity.Contrato;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 
-    @Override
-    Optional<Contrato> findById(Long aLong);
+    Optional<Object> findByImovel_Id(long imovelId);
 
-    Optional<Contrato> findByCasa_Id(long id);
+    Optional<Object> findByInquilino_Id(long inquilinoId);
 
-    Optional<Contrato> findByInquilino_Id(long id);
-
-    Optional<Contrato> findByLocatario_Id(long id);
-
-
-
-
-
-
-
-
+    Optional<Object> findByLocador_Id(long locadorId);
 }

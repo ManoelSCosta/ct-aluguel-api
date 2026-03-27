@@ -1,36 +1,40 @@
 package com.mscosta.imoblygestapi.dto.request;
 
-public class CasaRequestDto {
+public class ImovelRequestDto {
     private String descricao;
     private String endereco;
 
     private int page;
     private int size;
 
-
     public String getDescricao() {
-        return this.descricao;
+        return descricao;
     }
+
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
+
     public String getEndereco() {
-        return this.endereco;
+        return endereco;
     }
+
     public void setEndereco(String endereco) {
         this.endereco = endereco;
     }
 
-
     public int getPage() {
-        return this.page;
+        return page;
     }
+
     public void setPage(int page) {
         this.page = page;
     }
+
     public int getSize() {
-        return this.size;
+        return size;
     }
+
     public void setSize(int size) {
         this.size = size;
     }

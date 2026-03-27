@@ -6,7 +6,7 @@ public class ContratoRequestDto {
     private Date dataInicioContrato;
     private Date dataFimContrato;
     private Double valorAluguel;
-    private CasaRequestDto casa;
+    private ImovelRequestDto casa;
     private PessoaRequestDto inquilino;
     private PessoaRequestDto locatario;
 
@@ -34,11 +34,11 @@ public class ContratoRequestDto {
         this.valorAluguel = valorAluguel;
     }
 
-    public CasaRequestDto getCasa() {
+    public ImovelRequestDto getCasa() {
         return casa;
     }
 
-    public void setCasa(CasaRequestDto casa) {
+    public void setCasa(ImovelRequestDto casa) {
         this.casa = casa;
     }
 

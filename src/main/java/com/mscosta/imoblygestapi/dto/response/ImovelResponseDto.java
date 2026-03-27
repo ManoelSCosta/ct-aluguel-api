@@ -1,11 +1,11 @@
 package com.mscosta.imoblygestapi.dto.response;
 
-public class CasaResponseDto {
+public class ImovelResponseDto {
     private String descricao;
     private String endereco;
     private Boolean disponivel;
 
-    public CasaResponseDto(String descricao, String endereco, Boolean disponivel) {
+    public ImovelResponseDto(String descricao, String endereco, Boolean disponivel) {
         this.descricao = descricao;
         this.endereco = endereco;
         this.disponivel = disponivel;

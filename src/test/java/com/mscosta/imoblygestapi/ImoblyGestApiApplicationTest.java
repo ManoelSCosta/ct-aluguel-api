@@ -1,13 +1,12 @@
-package com.mscosta.ctaluguelapi;
+package com.mscosta.imoblygestapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CtAluguelApiApplicationTests {
+class ImoblyGestApiApplicationTest {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
 }

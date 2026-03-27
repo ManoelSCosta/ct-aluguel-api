@@ -1,21 +1,36 @@
 package com.mscosta.imoblygestapi.service;
 
 import com.mscosta.imoblygestapi.repository.ContratoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ContratoService {
-    @Autowired
-    private ContratoRepository contratoRepository;
 
-    public boolean existContratoByCasaId(long id) {
-        return contratoRepository.findByCasa_Id(id).isPresent();
+    private final ContratoRepository contratoRepository;
+
+    public ContratoService(ContratoRepository contratoRepository) {
+        this.contratoRepository = contratoRepository;
     }
 
-    public boolean getContratoByPessoaId(long id) {
-        return contratoRepository.findByInquilino_Id(id).isPresent() || contratoRepository.findByLocatario_Id(id).isPresent();
+
+    public boolean existsContratoById(long id) {
+        return contratoRepository.findById(id).isPresent();
     }
 
+    public boolean existsContratoByImovelId(long imovelId) {
+        return contratoRepository.findByImovel_Id(imovelId).isPresent();
+    }
+
+    public boolean existsContratoByPessoaId(long pessoaId) {
+        return existsContratoByInquilinoId(pessoaId) || existsContratoByLocadorId(pessoaId);
+    }
+
+    public boolean existsContratoByInquilinoId(long inquilinoId) {
+        return contratoRepository.findByInquilino_Id(inquilinoId).isPresent();
+    }
+
+    public boolean existsContratoByLocadorId(long locadorId) {
+        return contratoRepository.findByLocador_Id(locadorId).isPresent();
+    }
 
 }
