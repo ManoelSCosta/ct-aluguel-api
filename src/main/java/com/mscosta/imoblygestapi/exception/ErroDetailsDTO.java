@@ -1,23 +1,24 @@
 package com.mscosta.imoblygestapi.exception;
 
-import java.time.LocalDateTime;
-
 public class ErroDetailsDTO {
+
     private final String message;
+    private final String exceptionMessage;
 
-    private final String exception;
-
-    public ErroDetailsDTO(String message, Exception exception) {
+    public ErroDetailsDTO(String message, Throwable exception) {
         this.message = message;
-        this.exception = exception.getLocalizedMessage();
+        this.exceptionMessage = extractExceptionMessage(exception);
     }
 
+    private static String extractExceptionMessage(Throwable exception) {
+        return exception == null ? null : exception.getLocalizedMessage();
+    }
 
     public String getMessage() {
         return message;
     }
 
     public String getException() {
-        return exception;
+        return exceptionMessage;
     }
 }

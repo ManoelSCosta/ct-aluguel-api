@@ -1,13 +1,17 @@
 package com.mscosta.imoblygestapi.exception;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Não foi encontrado um registro correspondente")
+import java.io.Serial;
+
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = NotFoundException.REASON)
 public class NotFoundException extends RuntimeException {
 
-private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    static final String REASON = "Não foi encontrado um registro correspondente";
 
     public NotFoundException(String message) {
         super(message);
