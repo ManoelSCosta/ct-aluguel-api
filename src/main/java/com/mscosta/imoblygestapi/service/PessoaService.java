@@ -22,7 +22,7 @@ public class PessoaService {
     }
 
     public PessoaResponseDto createPessoa(PessoaRequestDto request) {
-        log.info("Criando nova pessoa com nome: {}", request.getNome());
+        log.info("Criando nova pessoa com nome: {}", request.nome());
         final var pessoa = toEntity(request);
         final var savedPessoa = savePessoa(pessoa);
         log.info("Pessoa criada com sucesso. ID: {}", savedPessoa.getId());
@@ -67,15 +67,15 @@ public class PessoaService {
 
     private Pessoa toEntity(PessoaRequestDto request) {
         final var pessoa = new Pessoa();
-        pessoa.setNome(request.getNome());
-        pessoa.setContato(request.getContato());
+        pessoa.setNome(request.nome());
+        pessoa.setContato(request.contato());
         return pessoa;
     }
 
     private void updateEntity(Pessoa pessoa, PessoaRequestDto request) {
         log.debug("Atualizando entidade pessoa. ID: {}", pessoa.getId());
-        pessoa.setNome(request.getNome());
-        pessoa.setContato(request.getContato());
+        pessoa.setNome(request.nome());
+        pessoa.setContato(request.contato());
     }
 
     private PessoaResponseDto toResponseDto(Pessoa pessoa) {

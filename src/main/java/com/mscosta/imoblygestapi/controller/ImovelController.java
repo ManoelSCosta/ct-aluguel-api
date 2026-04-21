@@ -29,7 +29,7 @@ public class ImovelController {
 
     @GetMapping
     public ResponseEntity<Page<ImovelResponseDto>> getAllImoveis(ImovelRequestDto request) {
-        final var pageable = PageRequest.of(request.getPage(), request.getSize());
+        final var pageable = PageRequest.of(request.page(), request.size());
         final var response = imovelService.getAllImoveis(request, pageable);
         return ResponseEntity.ok(response);
     }

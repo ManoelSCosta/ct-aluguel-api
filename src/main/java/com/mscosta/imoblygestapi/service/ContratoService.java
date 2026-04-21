@@ -1,36 +1,108 @@
 package com.mscosta.imoblygestapi.service;
 
+import com.mscosta.imoblygestapi.dto.request.ContratoRequestDto;
+import com.mscosta.imoblygestapi.dto.response.ContratoResponseDto;
+import com.mscosta.imoblygestapi.entity.Contrato;
+import com.mscosta.imoblygestapi.enums.StatusContrato;
+import com.mscosta.imoblygestapi.exception.NotFoundException;
 import com.mscosta.imoblygestapi.repository.ContratoRepository;
+import com.mscosta.imoblygestapi.repository.ImovelRepository;
+import com.mscosta.imoblygestapi.repository.PessoaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 public class ContratoService {
 
-    private final ContratoRepository contratoRepository;
+    private static final Logger log = LoggerFactory.getLogger(ContratoService.class);
+    private static final String CONTRATO_NAO_ENCONTRADO = "Contrato não encontrado";
+    private static final String IMOVEL_NAO_ENCONTRADO = "Imóvel não encontrado";
+    private static final String PESSOA_NAO_ENCONTRADA = "Pessoa não encontrada";
 
-    public ContratoService(ContratoRepository contratoRepository) {
+    private final ContratoRepository contratoRepository;
+    private final ImovelRepository imovelRepository;
+    private final PessoaRepository pessoaRepository;
+    private final AluguelService aluguelService;
+
+    public ContratoService(ContratoRepository contratoRepository,
+                           ImovelRepository imovelRepository,
+                           PessoaRepository pessoaRepository,
+                           AluguelService aluguelService) {
         this.contratoRepository = contratoRepository;
+        this.imovelRepository = imovelRepository;
+        this.pessoaRepository = pessoaRepository;
+        this.aluguelService = aluguelService;
     }
 
+    @Transactional
+    public ContratoResponseDto abrirContrato(ContratoRequestDto request) {
+        log.info("Abrindo novo contrato para imóvel ID: {}", request.idImovel());
 
-    public boolean existsContratoById(long id) {
-        return contratoRepository.findById(id).isPresent();
+        final var imovel = imovelRepository.findById(request.idImovel())
+                .orElseThrow(() -> new NotFoundException(IMOVEL_NAO_ENCONTRADO));
+
+        final var inquilino = pessoaRepository.findById(request.idInquilino())
+                .orElseThrow(() -> new NotFoundException(PESSOA_NAO_ENCONTRADA));
+
+        final var locador = pessoaRepository.findById(request.idLocador())
+                .orElseThrow(() -> new NotFoundException(PESSOA_NAO_ENCONTRADA));
+
+        final var contrato = new Contrato();
+        contrato.setImovel(imovel);
+        contrato.setInquilino(inquilino);
+        contrato.setLocador(locador);
+        contrato.setDataInicioContrato(request.dataInicioContrato());
+        contrato.setDataFimContrato(request.dataFimContrato());
+        contrato.setValorAluguel(request.valorAluguel());
+        contrato.setStatusContrato(StatusContrato.A);
+        contrato.setDataCriacao(LocalDateTime.now());
+
+        final var savedContrato = contratoRepository.save(contrato);
+        log.info("Contrato aberto com sucesso. ID: {}", savedContrato.getId());
+
+        aluguelService.gerarAlugueis(savedContrato);
+
+        return toResponseDto(savedContrato);
+    }
+
+    public java.util.List<ContratoResponseDto> listarContratosAtivos() {
+        log.info("Listando todos os contratos ativos");
+        return contratoRepository.findAllByStatusContrato(StatusContrato.A)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    public ContratoResponseDto getContratoById(long id) {
+        log.info("Buscando contrato por ID: {}", id);
+        final var contrato = findContratoById(id);
+        return toResponseDto(contrato);
     }
 
     public boolean existsContratoByImovelId(long imovelId) {
-        return contratoRepository.findByImovel_Id(imovelId).isPresent();
+        return contratoRepository.existsByImovelIdAndStatusContrato(imovelId, StatusContrato.A);
     }
 
-    public boolean existsContratoByPessoaId(long pessoaId) {
-        return existsContratoByInquilinoId(pessoaId) || existsContratoByLocadorId(pessoaId);
+    private Contrato findContratoById(long id) {
+        return contratoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(CONTRATO_NAO_ENCONTRADO));
     }
 
-    public boolean existsContratoByInquilinoId(long inquilinoId) {
-        return contratoRepository.findByInquilino_Id(inquilinoId).isPresent();
+    private ContratoResponseDto toResponseDto(Contrato contrato) {
+        final var response = new ContratoResponseDto();
+        response.setId(contrato.getId());
+        response.setDataCriacao(contrato.getDataCriacao());
+        response.setDataInicioContrato(contrato.getDataInicioContrato());
+        response.setDataFimContrato(contrato.getDataFimContrato());
+        response.setValorAluguel(contrato.getValorAluguel());
+        response.setStatusContrato(contrato.getStatusContrato());
+        response.setNomeInquilino(contrato.getInquilino().getNome());
+        response.setNomeLocador(contrato.getLocador().getNome());
+        response.setDescricaoImovel(contrato.getImovel().getDescricao());
+        return response;
     }
-
-    public boolean existsContratoByLocadorId(long locadorId) {
-        return contratoRepository.findByLocador_Id(locadorId).isPresent();
-    }
-
 }

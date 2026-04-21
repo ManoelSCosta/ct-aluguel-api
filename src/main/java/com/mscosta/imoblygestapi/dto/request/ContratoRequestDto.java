@@ -1,60 +1,13 @@
 package com.mscosta.imoblygestapi.dto.request;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-public class ContratoRequestDto {
-    private Date dataInicioContrato;
-    private Date dataFimContrato;
-    private Double valorAluguel;
-    private ImovelRequestDto casa;
-    private PessoaRequestDto inquilino;
-    private PessoaRequestDto locatario;
-
-    public Date getDataInicioContrato() {
-        return dataInicioContrato;
-    }
-
-    public void setDataInicioContrato(Date dataInicioContrato) {
-        this.dataInicioContrato = dataInicioContrato;
-    }
-
-    public Date getDataFimContrato() {
-        return dataFimContrato;
-    }
-
-    public void setDataFimContrato(Date dataFimContrato) {
-        this.dataFimContrato = dataFimContrato;
-    }
-
-    public Double getValorAluguel() {
-        return valorAluguel;
-    }
-
-    public void setValorAluguel(Double valorAluguel) {
-        this.valorAluguel = valorAluguel;
-    }
-
-    public ImovelRequestDto getCasa() {
-        return casa;
-    }
-
-    public void setCasa(ImovelRequestDto casa) {
-        this.casa = casa;
-    }
-
-    public PessoaRequestDto getInquilino() {
-        return inquilino;
-    }
-
-    public void setInquilino(PessoaRequestDto inquilino) {
-        this.inquilino = inquilino;
-    }
-
-    public PessoaRequestDto getLocatario() {
-        return locatario;
-    }
-
-    public void setLocatario(PessoaRequestDto locatario) {
-        this.locatario = locatario;
-    }
-}
+public record ContratoRequestDto(
+    Long idImovel,
+    Long idInquilino,
+    Long idLocador,
+    LocalDate dataInicioContrato,
+    LocalDate dataFimContrato,
+    BigDecimal valorAluguel
+) {}

@@ -29,8 +29,8 @@ public class ImovelService {
     public Page<ImovelResponseDto> getAllImoveis(ImovelRequestDto request, Pageable pageable) {
         return imovelRepository
                 .findByDescricaoLikeIgnoreCaseAndEnderecoLikeIgnoreCase(
-                        request.getDescricao(),
-                        request.getEndereco(),
+                        request.descricao(),
+                        request.endereco() != null ? request.endereco().logradouro() : null,
                         pageable
                 )
                 .map(this::toResponseDto);
@@ -38,8 +38,8 @@ public class ImovelService {
 
     public ImovelResponseDto criarImovel(ImovelRequestDto request) {
         final var imovel = new Imovel();
-        imovel.setEndereco(request.getEndereco());
-        imovel.setDescricao(request.getDescricao());
+        imovel.setEndereco(toEnderecoEntity(request.endereco()));
+        imovel.setDescricao(request.descricao());
 
         imovelRepository.save(imovel);
         return toResponseDto(loadImovelById(imovel.getId()));
@@ -47,8 +47,8 @@ public class ImovelService {
 
     public ImovelResponseDto atualizarImovel(long id, ImovelRequestDto request) {
         final var imovel = loadImovelById(id);
-        imovel.setEndereco(request.getEndereco());
-        imovel.setDescricao(request.getDescricao());
+        imovel.setEndereco(toEnderecoEntity(request.endereco()));
+        imovel.setDescricao(request.descricao());
 
         imovelRepository.save(imovel);
         return toResponseDto(loadImovelById(imovel.getId()));
@@ -65,6 +65,22 @@ public class ImovelService {
 
     private ImovelResponseDto toResponseDto(Imovel imovel) {
         final var isDisponivel = !contratoService.existsContratoByImovelId(imovel.getId());
-        return new ImovelResponseDto(imovel.getDescricao(), imovel.getEndereco(), isDisponivel);
+        String enderecoStr = imovel.getEndereco() != null ? imovel.getEndereco().toString() : "";
+        return new ImovelResponseDto(imovel.getDescricao(), enderecoStr, isDisponivel);
+    }
+
+    private com.mscosta.imoblygestapi.entity.Endereco toEnderecoEntity(com.mscosta.imoblygestapi.dto.request.EnderecoRequestDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        final var entity = new com.mscosta.imoblygestapi.entity.Endereco();
+        entity.setCep(dto.cep());
+        entity.setLogradouro(dto.logradouro());
+        entity.setNumero(dto.numero());
+        entity.setBairro(dto.bairro());
+        entity.setCidade(dto.cidade());
+        entity.setUf(dto.uf());
+        entity.setComplemento(dto.complemento());
+        return entity;
     }
 }
