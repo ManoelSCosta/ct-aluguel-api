@@ -2,17 +2,19 @@ package com.mscosta.imoblygestapi.entity;
 
 import com.mscosta.imoblygestapi.config.database.DatabaseConstants;
 import com.mscosta.imoblygestapi.enums.StatusAluguel;
+import com.mscosta.imoblygestapi.enums.converter.StatusAluguelConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -34,8 +36,8 @@ public class Aluguel {
     @GeneratedValue(generator = DatabaseConstants.Sequences.SEQ_ALUGUEL_ID, strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Convert(converter = StatusAluguelConverter.class)
+    @Column(name = "status", nullable = false, length = 1)
     private StatusAluguel status;
 
     @Column(name = "ano_referencia", nullable = false)
@@ -50,23 +52,33 @@ public class Aluguel {
     @Column(name = "valor_previsto", nullable = false)
     private BigDecimal valorPrevisto;
 
-    @Column(name = "valor_pago")
+    @Column(name = "valor_pago", nullable = false)
     private BigDecimal valorPago = VALOR_PAGO_PADRAO;
 
-    @Column(name = "data_criacao", nullable = false)
+    @Column(name = "data_criacao", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
     @Column(name = "data_modificacao")
     private LocalDateTime dataModificacao;
 
     @ManyToOne
-    @JoinColumn(name = "id_contrato")
+    @JoinColumn(name = "id_contrato", nullable = false)
     private Contrato contrato;
 
     @OneToMany(mappedBy = "aluguel", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Pagamento> pagamentos = new ArrayList<>();
 
     public Aluguel() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.dataCriacao = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.dataModificacao = LocalDateTime.now();
     }
 
     public Aluguel(Long id, StatusAluguel status, Integer anoReferencia, Integer mesReferencia, LocalDate dataVencimento, BigDecimal valorPrevisto, Contrato contrato, LocalDateTime dataCriacao, LocalDateTime dataModificacao) {

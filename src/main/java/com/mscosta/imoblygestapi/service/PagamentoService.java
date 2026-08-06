@@ -54,9 +54,9 @@ public class PagamentoService {
 
         // Atualizar o status do aluguel
         if (novoValorPagoTotal.compareTo(aluguel.getValorPrevisto()) >= 0) {
-            aluguel.setStatus(StatusAluguel.P);
+            aluguel.setStatus(StatusAluguel.PAGO);
         } else if (novoValorPagoTotal.compareTo(BigDecimal.ZERO) > 0) {
-            aluguel.setStatus(StatusAluguel.R);
+            aluguel.setStatus(StatusAluguel.PARCIAL);
         }
 
         aluguelRepository.save(aluguel);

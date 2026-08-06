@@ -1,26 +1,62 @@
-# Imobly-Gest-API 🏠
+# Imobly-Gest-API
 
-API para gestão de aluguéis de imóveis, permitindo cadastro de propriedades, inquilinos, contratos e registro de pagamentos.
+API REST para gestao de alugueis de imoveis, com foco no cadastro e controle de imoveis, inquilinos, contratos e pagamentos.
 
-## 📌 Funcionalidades
-- **Cadastro de Imóveis**: CRUD completo de propriedades para aluguel.
-- **Gerenciamento de Inquilinos**: Cadastro e histórico de locatários.
-- **Contratos**: Criação, renovação e cancelamento de contratos de aluguel.
-- **Pagamentos**: Registro de recibos e controle de inadimplências.
-- **Relatórios**: Em breve (futuras versões).
+## Visao geral
 
-## 🛠️ Tecnologias
-- **Backend**: 
-  - Java 17
-  - Spring Boot 3.2.4
-  - Spring Data JPA
-- **Banco de Dados**: PostgreSQL 15
-- **Ferramentas**:
-  - Maven (gerenciamento de dependências)
-  - Spring Boot DevTools (desenvolvimento)
-  - MockMvc (testes de API)
+O projeto foi construido com Spring Boot para centralizar operacoes comuns de uma administracao de locacoes, oferecendo uma base backend para registro e acompanhamento das principais entidades do dominio.
 
-## ⚙️ Pré-requisitos
-- JDK 17 ([Download oficial](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html))
-- PostgreSQL 15 ([Instalação](https://www.postgresql.org/download/))
-- IDE recomendada: IntelliJ IDEA ou VS Code (com extensão Java)
+## Funcionalidades
+
+- Cadastro e gerenciamento de imoveis
+- Cadastro e historico de inquilinos
+- Criacao, renovacao e cancelamento de contratos
+- Registro de pagamentos e acompanhamento de inadimplencia
+- Estrutura preparada para evolucao da documentacao da API
+
+## Tecnologias
+
+- Java 25
+- Spring Boot 3.5.0
+- Spring Data JPA
+- PostgreSQL
+- Maven
+- Springdoc OpenAPI
+- Spring REST Docs
+
+## Pre-requisitos
+
+- JDK 25
+- PostgreSQL configurado
+- Maven Wrapper (`./mvnw`) ou Maven instalado
+
+## Como executar
+
+1. Configure o banco de dados PostgreSQL e as variaveis/propriedades da aplicacao.
+2. Inicie a aplicacao:
+
+```bash
+./mvnw spring-boot:run
+```
+
+## Testes
+
+```bash
+./mvnw test
+```
+
+## Documentacao da API
+
+Com a aplicacao em execucao, a interface do OpenAPI pode ser acessada em:
+
+```text
+/swagger-ui/index.html
+```
+
+## Contribuicao
+
+Contribuicoes sao bem-vindas. Antes de abrir alteracoes, mantenha a documentacao e os testes alinhados com o comportamento esperado da API.
+
+## Licenca
+
+Este projeto esta licenciado sob os termos descritos em [LICENSE](LICENSE).

@@ -5,7 +5,9 @@ VOLUME_NAME="volume-misuradb"
 CONTAINER_NAME="container-misuradb"
 IMAGE="docker.io/library/postgres:16"
 
-DB_NAME="MISURADB"
+# Precisa bater com o database da URL em application.properties (minusculo:
+# o Postgres trata identificadores criados com aspas como case-sensitive).
+DB_NAME="misuradb"
 DB_USER="mscosta"
 DB_PASSWORD="mscosta"
 HOST_PORT="5432"

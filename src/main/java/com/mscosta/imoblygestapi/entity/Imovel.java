@@ -28,11 +28,12 @@ public class Imovel {
     @Column(name = "inscricao_iptu") // Identificação na prefeitura
     private String inscricaoIptu;
 
-    @Column(name = "valor_aluguel")
-    private BigDecimal valorAluguel;
+    /** Valor de referência para novos contratos; o valor efetivo fica no contrato. */
+    @Column(name = "valor_aluguel_sugerido", nullable = false)
+    private BigDecimal valorAluguelSugerido;
 
     @OneToOne(cascade = CascadeType.ALL) // Se apagar o imóvel, geralmente apaga o endereço
-    @JoinColumn(name = "id_endereco", referencedColumnName = "id")
+    @JoinColumn(name = "id_endereco", referencedColumnName = "id", nullable = false)
     private Endereco endereco;
 
     @Column(name = "data_criacao", nullable = false, updatable = false)
@@ -97,12 +98,12 @@ public class Imovel {
         this.inscricaoIptu = inscricaoIptu;
     }
 
-    public BigDecimal getValorAluguel() {
-        return valorAluguel;
+    public BigDecimal getValorAluguelSugerido() {
+        return valorAluguelSugerido;
     }
 
-    public void setValorAluguel(BigDecimal valorAluguel) {
-        this.valorAluguel = valorAluguel;
+    public void setValorAluguelSugerido(BigDecimal valorAluguelSugerido) {
+        this.valorAluguelSugerido = valorAluguelSugerido;
     }
 
     public Endereco getEndereco() {

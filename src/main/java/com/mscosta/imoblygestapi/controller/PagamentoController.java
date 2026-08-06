@@ -3,6 +3,7 @@ package com.mscosta.imoblygestapi.controller;
 import com.mscosta.imoblygestapi.dto.request.PagamentoRequestDto;
 import com.mscosta.imoblygestapi.dto.response.PagamentoResponseDto;
 import com.mscosta.imoblygestapi.service.PagamentoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class PagamentoController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PagamentoResponseDto> registrarPagamento(
-            @RequestPart("pagamento") PagamentoRequestDto request,
+            @Valid @RequestPart("pagamento") PagamentoRequestDto request,
             @RequestPart(value = "comprovante", required = false) MultipartFile comprovante) throws IOException {
         
         byte[] comprovanteBytes = (comprovante != null) ? comprovante.getBytes() : null;

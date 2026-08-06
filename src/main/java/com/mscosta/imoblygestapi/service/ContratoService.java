@@ -4,6 +4,7 @@ import com.mscosta.imoblygestapi.dto.request.ContratoRequestDto;
 import com.mscosta.imoblygestapi.dto.response.ContratoResponseDto;
 import com.mscosta.imoblygestapi.entity.Contrato;
 import com.mscosta.imoblygestapi.enums.StatusContrato;
+import com.mscosta.imoblygestapi.exception.BusinessException;
 import com.mscosta.imoblygestapi.exception.NotFoundException;
 import com.mscosta.imoblygestapi.repository.ContratoRepository;
 import com.mscosta.imoblygestapi.repository.ImovelRepository;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ContratoService {
@@ -22,6 +23,8 @@ public class ContratoService {
     private static final String CONTRATO_NAO_ENCONTRADO = "Contrato não encontrado";
     private static final String IMOVEL_NAO_ENCONTRADO = "Imóvel não encontrado";
     private static final String PESSOA_NAO_ENCONTRADA = "Pessoa não encontrada";
+    private static final String IMOVEL_JA_LOCADO = "Imóvel já possui contrato ativo";
+    private static final String LOCADOR_IGUAL_INQUILINO = "Locador e inquilino devem ser pessoas distintas";
 
     private final ContratoRepository contratoRepository;
     private final ImovelRepository imovelRepository;
@@ -42,6 +45,8 @@ public class ContratoService {
     public ContratoResponseDto abrirContrato(ContratoRequestDto request) {
         log.info("Abrindo novo contrato para imóvel ID: {}", request.idImovel());
 
+        validarPartes(request);
+
         final var imovel = imovelRepository.findById(request.idImovel())
                 .orElseThrow(() -> new NotFoundException(IMOVEL_NAO_ENCONTRADO));
 
@@ -58,8 +63,19 @@ public class ContratoService {
         contrato.setDataInicioContrato(request.dataInicioContrato());
         contrato.setDataFimContrato(request.dataFimContrato());
         contrato.setValorAluguel(request.valorAluguel());
-        contrato.setStatusContrato(StatusContrato.A);
-        contrato.setDataCriacao(LocalDateTime.now());
+        contrato.setTipoGarantia(request.tipoGarantia());
+        contrato.setStatusContrato(StatusContrato.ATIVO);
+
+        // Nulos aqui significam "usar o padrão da entidade", não "limpar o valor".
+        if (request.diaVencimento() != null) {
+            contrato.setDiaVencimento(request.diaVencimento());
+        }
+        if (request.multaAtrasoPerc() != null) {
+            contrato.setMultaAtrasoPerc(request.multaAtrasoPerc());
+        }
+        if (request.jurosMesPerc() != null) {
+            contrato.setJurosMesPerc(request.jurosMesPerc());
+        }
 
         final var savedContrato = contratoRepository.save(contrato);
         log.info("Contrato aberto com sucesso. ID: {}", savedContrato.getId());
@@ -69,22 +85,33 @@ public class ContratoService {
         return toResponseDto(savedContrato);
     }
 
-    public java.util.List<ContratoResponseDto> listarContratosAtivos() {
+    @Transactional(readOnly = true)
+    public List<ContratoResponseDto> listarContratosAtivos() {
         log.info("Listando todos os contratos ativos");
-        return contratoRepository.findAllByStatusContrato(StatusContrato.A)
+        return contratoRepository.findAllByStatusContrato(StatusContrato.ATIVO)
                 .stream()
                 .map(this::toResponseDto)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public ContratoResponseDto getContratoById(long id) {
         log.info("Buscando contrato por ID: {}", id);
-        final var contrato = findContratoById(id);
-        return toResponseDto(contrato);
+        return toResponseDto(findContratoById(id));
     }
 
+    @Transactional(readOnly = true)
     public boolean existsContratoByImovelId(long imovelId) {
-        return contratoRepository.existsByImovelIdAndStatusContrato(imovelId, StatusContrato.A);
+        return contratoRepository.existsByImovelIdAndStatusContrato(imovelId, StatusContrato.ATIVO);
+    }
+
+    private void validarPartes(ContratoRequestDto request) {
+        if (request.idLocador().equals(request.idInquilino())) {
+            throw new BusinessException(LOCADOR_IGUAL_INQUILINO);
+        }
+        if (existsContratoByImovelId(request.idImovel())) {
+            throw new BusinessException(IMOVEL_JA_LOCADO);
+        }
     }
 
     private Contrato findContratoById(long id) {

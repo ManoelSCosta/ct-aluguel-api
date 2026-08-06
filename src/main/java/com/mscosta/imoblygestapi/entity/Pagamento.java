@@ -1,5 +1,6 @@
 package com.mscosta.imoblygestapi.entity;
 
+import com.mscosta.imoblygestapi.config.database.DatabaseConstants;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,16 +16,16 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = Pagamento.TABLE_NAME, schema = Pagamento.SCHEMA_NAME)
+@Table(name = DatabaseConstants.Tables.PAGAMENTO, schema = DatabaseConstants.SCHEMA_NAME)
 public class Pagamento {
 
-    static final String TABLE_NAME = "pagamento";
-    static final String SCHEMA_NAME = "imobly";
-    static final String SEQUENCE_NAME = "seq_pagamento_id";
-
     @Id
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
-    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = DatabaseConstants.Sequences.SEQ_PAGAMENTO_ID,
+            sequenceName = DatabaseConstants.Sequences.SEQ_PAGAMENTO_ID,
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = DatabaseConstants.Sequences.SEQ_PAGAMENTO_ID, strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "descricao", nullable = false)
@@ -36,11 +37,11 @@ public class Pagamento {
     @Column(name = "data_pagamento", nullable = false)
     private LocalDateTime dataPagamento;
 
-    @Column(name = "comprovante_pagamento", columnDefinition = "bytea")
+    @Column(name = "comprovante_bytea", columnDefinition = "bytea")
     private byte[] comprovantePagamento;
 
     @ManyToOne
-    @JoinColumn(name = "id_aluguel")
+    @JoinColumn(name = "id_aluguel", nullable = false)
     private Aluguel aluguel;
 
     protected Pagamento() {
@@ -106,5 +107,21 @@ public class Pagamento {
 
     public void setAluguel(Aluguel aluguel) {
         this.aluguel = aluguel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Pagamento pagamento)) {
+            return false;
+        }
+        return id != null && Objects.equals(id, pagamento.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
