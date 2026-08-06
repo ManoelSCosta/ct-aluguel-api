@@ -2,6 +2,7 @@ package com.mscosta.imoblygestapi.config.logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -10,6 +11,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 
@@ -24,6 +26,10 @@ public class LoggerAspect {
                     "execution(* com.mscosta.imoblygestapi.service..*(..))";
 
     static {
+        // Sem o módulo JSR-310 qualquer DTO com LocalDate/LocalDateTime — praticamente
+        // todos aqui — vira "Erro ao serializar argumento" no log.
+        MAPPER.registerModule(new JavaTimeModule());
+        MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
         MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
@@ -71,6 +77,15 @@ public class LoggerAspect {
 
         if (isPrimitiveOrWrapperOrString(arg)) {
             return arg.toString();
+        }
+
+        // Comprovante: registrar só nome e tamanho, senão o arquivo inteiro vai para o log.
+        if (arg instanceof byte[] bytes) {
+            return String.format("byte[%d]", bytes.length);
+        }
+
+        if (arg instanceof MultipartFile arquivo) {
+            return String.format("arquivo[%s, %d bytes]", arquivo.getOriginalFilename(), arquivo.getSize());
         }
 
         try {

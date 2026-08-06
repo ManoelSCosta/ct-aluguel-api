@@ -33,49 +33,68 @@ Nenhuma funcionalidade nova. Sem isso, tudo o que vier depois é construído sob
 
 ### 0.1 Migração versionada
 
-- [ ] Adicionar dependência `flyway-core` + `flyway-database-postgresql` ao `pom.xml`
-- [ ] Converter `scripts/initdb/001–005` em `V1__baseline.sql`
-- [ ] Configurar `spring.flyway.schemas=imobly` e `baseline-on-migrate=true`
-- [ ] Fixar `spring.jpa.hibernate.ddl-auto=validate` — o Hibernate nunca mais altera schema
-- [ ] Remover `scripts/initdb/` da execução (manter `start-postgres.sh` para dev local)
+- [x] Adicionar dependência `flyway-core` + `flyway-database-postgresql` ao `pom.xml`
+- [x] Converter `scripts/initdb/001–005` em `V1__baseline.sql`
+- [x] Configurar `spring.flyway.schemas=imobly` (sem `baseline-on-migrate`: o schema antigo
+      veio do `ddl-auto=update` e não corresponde ao `V1`; recriar é mais seguro que assumir baseline)
+- [x] Fixar `spring.jpa.hibernate.ddl-auto=validate` — o Hibernate nunca mais altera schema
+- [x] Remover `scripts/initdb/` da execução (manter `start-postgres.sh` para dev local)
 
 ### 0.2 Corrigir divergências entidade × DDL
 
 Referência: seção 9.1 do ARQUITETURA.md.
 
-- [ ] `Pagamento` — `comprovante_pagamento` → `comprovante_bytea`
-- [ ] `Pagamento` — usar `DatabaseConstants` em vez das constantes locais
-- [ ] `Imovel` — `valor_aluguel` → `valor_aluguel_sugerido`
-- [ ] `Pessoa` — mapear `Set<Endereco>` com `@ManyToMany` sobre `endereco_pessoa`
-- [ ] `Pessoa` — trocar `contato` por `email` + `telefone`
-- [ ] `Pessoa` — mapear `nacionalidade`
-- [ ] `Contrato` — mapear `tipo_garantia`, `dia_vencimento`, `multa_atraso_perc`, `juros_mes_perc`
-- [ ] `Contrato` — `getId()`/`setId()` para `Long`
-- [ ] `Contrato` — remover import de `org.springframework.cglib.core.Local`
-- [ ] `AluguelService` — usar `contrato.diaVencimento` no lugar do dia 10 fixo
+- [x] `Pagamento` — `comprovante_pagamento` → `comprovante_bytea`
+- [x] `Pagamento` — usar `DatabaseConstants` em vez das constantes locais
+- [x] `Imovel` — `valor_aluguel` → `valor_aluguel_sugerido`
+- [x] `Pessoa` — mapear `Set<Endereco>` com `@ManyToMany` sobre `endereco_pessoa`
+- [x] `Pessoa` — trocar `contato` por `email` + `telefone`
+- [x] `Pessoa` — mapear `nacionalidade`
+- [x] `Contrato` — mapear `tipo_garantia`, `dia_vencimento`, `multa_atraso_perc`, `juros_mes_perc`
+- [x] `Contrato` — `getId()`/`setId()` para `Long`
+- [x] `Contrato` — remover import de `org.springframework.cglib.core.Local`
+- [x] `AluguelService` — usar `contrato.diaVencimento` no lugar do dia 10 fixo
 
 ### 0.3 Enums legíveis
 
-- [ ] Renomear `StatusAluguel.A/R/P` → `ABERTO/PARCIAL/PAGO`
-- [ ] Renomear `StatusContrato.A/E/C` → `ATIVO/ENCERRADO/CANCELADO`
-- [ ] Criar `AttributeConverter` por enum, persistindo o `CHAR(1)` do DDL
-- [ ] Trocar `@Enumerated(STRING)` por `@Convert` nas entidades
+- [x] Renomear `StatusAluguel.A/R/P` → `ABERTO/PARCIAL/PAGO`
+- [x] Renomear `StatusContrato.A/E/C` → `ATIVO/ENCERRADO/CANCELADO`
+- [x] Criar `AttributeConverter` por enum, persistindo o `CHAR(1)` do DDL
+- [x] Trocar `@Enumerated(STRING)` por `@Convert` nas entidades
 
 ### 0.4 Validação de entrada
 
-- [ ] Adicionar `spring-boot-starter-validation`
-- [ ] Anotar os request DTOs (`@NotNull`, `@Positive`, `@PastOrPresent`)
-- [ ] `@Valid` nos controllers
-- [ ] Tratar `MethodArgumentNotValidException` no `GlobalExceptionHandler`
+- [x] Adicionar `spring-boot-starter-validation`
+- [x] Anotar os request DTOs (`@NotNull`, `@Positive`, `@PastOrPresent`)
+- [x] `@Valid` nos controllers
+- [x] Tratar `MethodArgumentNotValidException` no `GlobalExceptionHandler`
 
 ### 0.5 Rede de segurança
 
-- [ ] `spring-boot-testcontainers` + `postgresql` no escopo de teste
-- [ ] Teste de contexto que sobe a app contra Postgres real e valida o schema
-- [ ] Um teste de integração por fluxo existente (abrir contrato, registrar pagamento)
+- [x] `spring-boot-testcontainers` + `postgresql` no escopo de teste
+- [x] Teste de contexto que sobe a app contra Postgres real e valida o schema
+- [x] Um teste de integração por fluxo existente (abrir contrato, registrar pagamento)
 
 **Critério de aceite:** `./mvnw verify` passa com Postgres real, `ddl-auto=validate`
 não reclama, e abrir um contrato gera aluguéis com o dia de vencimento correto do contrato.
+
+**Status: concluída em 2026-08-06.** `./mvnw verify` → 11 testes, 0 falhas.
+
+Para rodar os testes com Podman em vez de Docker:
+
+```bash
+systemctl --user start podman.socket
+DOCKER_HOST=unix:///run/user/1000/podman/podman.sock \
+TESTCONTAINERS_RYUK_DISABLED=true \
+./mvnw verify
+```
+
+Antes de subir a app local pela primeira vez, recrie o schema — o banco atual foi
+criado pelo `ddl-auto=update` e o Flyway não consegue aplicar o `V1` sobre ele:
+
+```sql
+DROP SCHEMA IF EXISTS imobly CASCADE;
+```
 
 ---
 

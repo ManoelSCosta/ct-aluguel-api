@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AluguelRepository extends JpaRepository<Aluguel, Long> {
-    List<Aluguel> findAllByContratoId(Long contratoId);
+    /** Sem ORDER BY o Postgres não garante ordem; a competência é a ordem que faz sentido para quem lê. */
+    List<Aluguel> findAllByContratoIdOrderByAnoReferenciaAscMesReferenciaAsc(Long contratoId);
 }

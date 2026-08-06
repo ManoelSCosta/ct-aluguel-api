@@ -46,6 +46,10 @@ public class PagamentoService {
                 aluguel
         );
 
+        // Manter os dois lados da associação: sem isso o aluguel já carregado na
+        // sessão continua sem o pagamento recém-registrado.
+        aluguel.adicionarPagamento(pagamento);
+
         final var savedPagamento = pagamentoRepository.save(pagamento);
 
         // Atualizar o valor pago no aluguel

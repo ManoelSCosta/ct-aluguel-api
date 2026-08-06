@@ -2,6 +2,7 @@
 
 > Documento de referência do desenho da aplicação.
 > Versão 1.0 — 2026-08-05. Plano de execução em [PLANO-DE-ACAO.md](PLANO-DE-ACAO.md).
+> Diagramas do código como ele está hoje em [DIAGRAMAS.md](DIAGRAMAS.md).
 
 ---
 

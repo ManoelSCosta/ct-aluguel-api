@@ -57,7 +57,7 @@ public class AluguelService {
     @Transactional(readOnly = true)
     public List<AluguelResponseDto> listarAlugueisPorContrato(Long contratoId) {
         log.info("Listando aluguéis para o contrato ID: {}", contratoId);
-        return aluguelRepository.findAllByContratoId(contratoId)
+        return aluguelRepository.findAllByContratoIdOrderByAnoReferenciaAscMesReferenciaAsc(contratoId)
                 .stream()
                 .map(this::toResponseDto)
                 .toList();
